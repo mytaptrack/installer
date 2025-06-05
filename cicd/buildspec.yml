@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: latest
+    commands:
+      - yum install git-all -y
+      - npm install -g npm@latest aws-cdk@latest esbuild@latest
+  pre_build:
+    commands:
+      - git clone https://github.com/mytaptrack/back-end.git
+  build:
+    commands:
+      - cd back-end
+      - echo aws s3 cp s3://mytaptrack-${AWS_ACCOUNT_ID}-environments/${AWS_REGION}/${STAGE}.yml ./config/${STAGE}.yml
+      - aws s3 cp s3://mytaptrack-${AWS_ACCOUNT_ID}-environments/${AWS_REGION}/${STAGE}.yml ./config/${STAGE}.yml
+      - make install-deps
+      - make deploy
