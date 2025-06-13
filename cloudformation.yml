@@ -78,7 +78,7 @@ Resources:
   FargateCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: fargate-cluster
+      ClusterName: mytaptrack-installer-cluster
 
   AdminTaskRole:
     Type: AWS::IAM::Role
@@ -90,15 +90,40 @@ Resources:
             Principal:
               Service: ecs-tasks.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+      Policies:
+        - PolicyName: mytaptrack-installer-task-role
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                     # Allow read access to SSM Parameter Store
+                  - "ssm:GetParameters"
+                  - "ssm:GetParameter"
+                  - "ssm:GetParameterHistory"
+                  - "ssm:GetParametersByPath"
 
+                  # Allow writing logs to CloudWatch
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "s3:*"
+                  - "ssm:*"
+                  - "kms:*"
+                  - "cloudformation:*"
+                  - "codebuild:*"
+                  - "secretsmanager:*"
+                  - "ecr:*"
+                  - "ecs:*"
+                  - "lambda:*"
+                  - "dynamodb:*"
+                Effect: Allow
+                Resource: "*"
   FargateTask:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: fargate-task
-      Cpu: 256
-      Memory: 512
+      Family: mytaptrack-installer-task
+      Cpu: '256'
+      Memory: '512'
       NetworkMode: awsvpc
       RuntimePlatform:
         CpuArchitecture: ARM64
@@ -126,7 +151,7 @@ Resources:
   FargateService:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: fargate-service
+      ServiceName: mytaptrack-installer-service
       Cluster: !Ref FargateCluster
       DesiredCount: 1
       TaskDefinition: !Ref FargateTask

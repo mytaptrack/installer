@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: latest
+    commands:
+      - yum install git-all -y
+      - npm install -g npm@latest aws-cdk@latest esbuild@latest
+  pre_build:
+    commands:
+      - git clone https://github.com/mytaptrack/front-end.git
+      - cd front-end
+      - git fetch origin ${BRANCH}
+      - git switch ${BRANCH}
+  build:
+    commands:
+      - make deploy-s3

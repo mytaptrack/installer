@@ -1,0 +1,10 @@
+
+button[kind=primary] {
+    background-color: #66f;
+    border-color: #006;
+}
+
+button[kind=primary]:hover {
+    background-color: #88f;
+    border-color: #226;
+}
