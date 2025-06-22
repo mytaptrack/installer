@@ -103,4 +103,4 @@ if st.button('Remove installer (Save Money)', type='tertiary', icon=':material/d
 st.write("""Removing the installer does not mean you can't reinstall it and continue where you left off. 
          All this does is remove the active components which cost money to run and are not necessary for mytaptrack to operate.""")
 
-bottom_bar('./pages/8_update_config.py', '')
+bottom_bar('deploy')

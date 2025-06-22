@@ -17,4 +17,4 @@ st.write('### General Configs')
 st.session_state['config']['env']['regional']['templates']['path'] = st.text_input("What is the default path to the templates", st.session_state['config']['env']['regional']['templates']['path'])
 st.session_state['config']['env']['student']['remove']['timeout'] = st.number_input("How long should the student be removed after?", value=st.session_state['config']['env']['student']['remove']['timeout'])
 
-bottom_bar('./pages/5_notifications.py', './pages/7_system_validation.py')
+bottom_bar('general')

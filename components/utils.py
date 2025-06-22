@@ -17,15 +17,31 @@ def apply_styles():
     with st.sidebar:
         st.logo('./sm-text-logo.gif', size='large')
 
-def bottom_bar(prev: str, next: str):
+page_order = [
+    { "name": "start", "file": "mytaptrack_installer.py" },
+    { "name": "domains", "file": "pages/1_domains.py" },
+    { "name": "website", "file": "pages/2_website.py" },
+    { "name": "network and logging", "file": "pages/3_network_and_logging.py" },
+    { "name": "encryption", "file": "pages/4_encryption.py" },
+    { "name": "notifications", "file": "pages/5_notifications.py" },
+    { "name": "general", "file": "pages/6_general.py" },
+    { "name": "system validation", "file": "pages/7_system_validation.py" },
+    { "name": "update config", "file": "pages/8_update_config.py" },
+    { "name": "deploy", "file": "pages/9_deploy.py" }
+]
+
+def bottom_bar(name: str):
     st.divider()
+
+    # Get the index of the current page
+    current_index = next((i for i, page in enumerate(page_order) if page["name"] == name), -1)
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if prev != '' and st.button('< Previous', type='primary'):
+        if current_index > 0 and st.button('< Previous', type='primary'):
             save()
-            st.switch_page(prev)
+            st.switch_page(page_order[current_index - 1]["file"])
 
     with col2:
         if st.button('Save'):
@@ -33,6 +49,6 @@ def bottom_bar(prev: str, next: str):
             st.rerun()
 
     with col3:
-        if next != '' and st.button('Next >', type='primary'):
+        if current_index < len(page_order) - 1 and st.button('Next >', type='primary'):
             save()
-            st.switch_page(next)
+            st.switch_page(page_order[current_index + 1]["file"])

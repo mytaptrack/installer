@@ -64,4 +64,4 @@ if st.session_state['config']['env']['deploy']['auto']:
         print(f'Local time: {deploy_time.hour}:{deploy_time.minute}')
         st.session_state['config']['env']['deploy']['time'] = deploy_time
 
-bottom_bar('./pages/7_system_validation.py', './pages/9_deploy.py')
+bottom_bar('update config')

@@ -44,4 +44,4 @@ if st.checkbox('Customize encryption'):
     # Get list of kms keys and aliases
     encryption_settings()
 
-bottom_bar('./pages/3_logging.py', './pages/5_notifications.py')
+bottom_bar('encryption')

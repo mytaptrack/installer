@@ -124,4 +124,4 @@ st.session_state['config']['env']['domain']['sub']['device']['apikey'] = st.text
 if not st.session_state['config']['env']['domain']['sub']['website']['name']:
     st.stop()
 
-bottom_bar('./mytaptrack_installer.py', './pages/2_website.py')
+bottom_bar('domains')

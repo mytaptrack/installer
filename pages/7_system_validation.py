@@ -40,4 +40,4 @@ else:
     st.session_state['config']['env']['testing'] = None
 
 
-bottom_bar('./pages/6_general.py', './pages/8_update_config.py')
+bottom_bar('system validation')

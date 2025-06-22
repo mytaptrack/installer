@@ -105,4 +105,4 @@ else:
     # Remove google from config
     st.session_state['config']['env']['website']['google'] = None
 
-bottom_bar('./pages/1_domains.py', './pages/3_logging.py')
+bottom_bar('website')

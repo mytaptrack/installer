@@ -57,7 +57,7 @@ else:
     st.session_state['config']['env']['app']['pushSnsArns']['ios'] = ''
 
 if st.checkbox("Use email", value= st.session_state['config']['env']['system']['email'] != ''):
-    st.session_state['config']['env']['system']['email'] = st.text_input('Email to use for notifications')
+    st.session_state['config']['env']['system']['email'] = st.text_input('Email to use for notifications', value= st.session_state['config']['env']['system']['email'])
 
     if st.session_state['config']['env']['system']['email']:
         # Check to see if the email is verified
@@ -152,12 +152,5 @@ if st.checkbox("Use twilio for sending text messages", value= twilio_secret != N
 else:
     st.session_state['config']['env']['sms']['secret'] = ''
 
-st.write('Chatbots are useful when supporting mytaptrack as errors and specific alerts can be sent to the chatbot')
-if st.checkbox("Use chatbot messaging", value= st.session_state['config']['env']['chatbot'] is not None ):
-    st.session_state['config']['env']['chatbot'] = {
-        'arn': st.text_input('Enter the chatbot arn')
-    }
-else:
-    st.session_state['config']['env']['chatbot'] = None
 
-bottom_bar('./pages/4_encryption.py', './pages/6_general.py')
+bottom_bar('notifications')
