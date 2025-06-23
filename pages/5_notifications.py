@@ -13,10 +13,10 @@ apply_styles()
 
 from components.html_resources import link
 
-ses = boto3.client('ses')
-sns = boto3.client('sns')
-secretsmanager = boto3.client('secretsmanager')
-chatbot = boto3.client('chatbot')
+ses = boto3.client('ses', config=st.session_state['b3config'])
+sns = boto3.client('sns', config=st.session_state['b3config'])
+secretsmanager = boto3.client('secretsmanager', config=st.session_state['b3config'])
+chatbot = boto3.client('chatbot', config=st.session_state['b3config'])
 
 region = st.session_state['config']['env']['region']['primary']
 

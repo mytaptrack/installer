@@ -10,8 +10,8 @@ auth_check()
 from components.utils import apply_styles
 apply_styles()
 
-ssm = boto3.client('ssm')
-kms = boto3.client('kms')
+ssm = boto3.client('ssm', config=st.session_state['b3config'])
+kms = boto3.client('kms', config=st.session_state['b3config'])
 
 st.write('### Encryption')
 if st.checkbox('Provide custom parameter store path for token encryption'):

@@ -1,7 +1,7 @@
 import streamlit as st
 import boto3
 
-kms = boto3.client('kms')
+kms = boto3.client('kms', config=st.session_state['b3config'])
 
 def set_encryption_alias(alias_name: str, display_name: str, dict_key: str, kms_keys):
     if dict_key not in st.session_state:

@@ -11,8 +11,8 @@ auth_check()
 from components.utils import apply_styles
 apply_styles()
 
-route53 = boto3.client('route53')
-acm = boto3.client('acm')
+route53 = boto3.client('route53', config=st.session_state['b3config'])
+acm = boto3.client('acm', config=st.session_state['b3config'])
 
 st.write('### DNS')
 

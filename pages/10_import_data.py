@@ -10,8 +10,8 @@ from components.utils import apply_styles
 apply_styles()
 
 # Create cognito user pool client
-cognito = boto3.client('cognito-idp')
-dynamodb = boto3.client('dynamodb')
+cognito = boto3.client('cognito-idp', config=st.session_state['b3config'])
+dynamodb = boto3.client('dynamodb', config=st.session_state['b3config'])
 
 def get_users_from_pool(stage: str):
     # Get user pool id from pool name

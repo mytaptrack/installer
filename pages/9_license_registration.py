@@ -12,9 +12,9 @@ apply_styles()
 
 stage = st.session_state['config']['env']['name']
 
-cloudformation = boto3.client('cloudformation')
-ssm = boto3.client('ssm')
-user_pool_client = boto3.client('cognito-idp')
+cloudformation = boto3.client('cloudformation', config=st.session_state['b3config'])
+ssm = boto3.client('ssm', config=st.session_state['b3config'])
+user_pool_client = boto3.client('cognito-idp', config=st.session_state['b3config'])
 
 def register_license(stage: str, name: str, licenseNumber: str, emails: str):
     # Get user pool id from parameter store

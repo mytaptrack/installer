@@ -10,8 +10,8 @@ auth_check()
 from components.utils import apply_styles
 apply_styles()
 
-s3 = boto3.client('s3')
-ec2 = boto3.client('ec2')
+s3 = boto3.client('s3', config=st.session_state['b3config'])
+ec2 = boto3.client('ec2', config=st.session_state['b3config'])
 
 account_id = st.session_state['account_id']
 

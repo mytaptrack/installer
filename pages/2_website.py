@@ -85,7 +85,7 @@ if st.checkbox('Use gmail authentication', value=google_conf != None):
     client_secret = st.text_input("Enter your google client secret", type='password', value=google_conf['client_secret'])
     if client_secret != google_conf['client_secret']:
         # Create secrets manager client
-        client = boto3.client('secretsmanager')
+        client = boto3.client('secretsmanager', config=st.session_state['b3config'])
 
         # Save secrets manager at /<env>/website/google/secret
         client.create_secret(

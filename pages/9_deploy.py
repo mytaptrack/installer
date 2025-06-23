@@ -13,8 +13,8 @@ auth_check()
 from components.utils import apply_styles
 apply_styles()
 
-codebuild = boto3.client('codebuild')
-codepipeline = boto3.client('codepipeline')
+codebuild = boto3.client('codebuild', config=st.session_state['b3config'])
+codepipeline = boto3.client('codepipeline', config=st.session_state['b3config'])
 
 st.write('### Deploy the system')
 
@@ -98,7 +98,7 @@ st.divider()
 
 if st.button('Remove installer (Save Money)', type='tertiary', icon=':material/delete:'):
     # Delete the installer stack
-    cloudformation = boto3.client('cloudformation')
+    cloudformation = boto3.client('cloudformation', config=st.session_state['b3config'])
     cloudformation.delete_stack(StackName=f'mytaptrack-installer')
 st.write("""Removing the installer does not mean you can't reinstall it and continue where you left off. 
          All this does is remove the active components which cost money to run and are not necessary for mytaptrack to operate.""")

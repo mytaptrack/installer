@@ -12,8 +12,8 @@ auth_check()
 from components.utils import apply_styles
 apply_styles()
 
-codebuild = boto3.client('codebuild')
-codepipeline = boto3.client('codepipeline')
+codebuild = boto3.client('codebuild', config=st.session_state['b3config'])
+codepipeline = boto3.client('codepipeline', config=st.session_state['b3config'])
 
 st.write('### Update Configuration')
 

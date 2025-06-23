@@ -2,7 +2,7 @@ import boto3
 import yaml
 import streamlit as st
 
-s3 = boto3.client('s3')
+s3 = boto3.client('s3', config=st.session_state['b3config'])
 
 def get_account_bucket(account_id: str):
     env_bucket_name = f'mytaptrack-{account_id}-environments'

@@ -1,5 +1,6 @@
 import streamlit as st
 import boto3
+from botocore.config import Config
 import os
 
 from components.config_storage import bootstrap_region, is_account_bootstrapped, load_config, save_config
@@ -19,7 +20,7 @@ if 'authenticated' not in st.session_state:
         st.stop()
 
 # Get the account id that we're connected to
-account_id = boto3.client("sts").get_caller_identity()["Account"]
+account_id = boto3.client("sts", config=st.session_state['b3config']).get_caller_identity()["Account"]
 st.session_state['account_id'] = account_id
 
 st.title('Mytaptrack Installer')
@@ -126,8 +127,6 @@ if index == 0:
 primary = st.selectbox('Primary AWS Region', regions, index=index)
 st.session_state['config']['env']['region']['primary'] = primary
 
-os.environ["AWS_REGION"] = primary
-
 if st.checkbox('Include a second disaster recovery region?'):
     secondary = st.selectbox('Secondary AWS Region', regions)
     st.session_state['config']['env']['region']['regions'] = f'{primary}, {secondary}'
@@ -137,17 +136,17 @@ else:
 if not primary:
     st.stop()
 
-os.environ['AWS_REGION'] = primary
+st.session_state['b3config'] = Config(region_name=primary)
 
 # Create route53 client
-route53 = boto3.client('route53')
-s3 = boto3.client('s3')
-acm = boto3.client('acm')
-ses = boto3.client('ses')
-sns = boto3.client('sns')
-ssm = boto3.client('ssm')
-kms = boto3.client('kms')
-codebuild = boto3.client('codebuild')
+route53 = boto3.client('route53', config=st.session_state['b3config'])
+s3 = boto3.client('s3', config=st.session_state['b3config'])
+acm = boto3.client('acm', config=st.session_state['b3config'])
+ses = boto3.client('ses', config=st.session_state['b3config'])
+sns = boto3.client('sns', config=st.session_state['b3config'])
+ssm = boto3.client('ssm', config=st.session_state['b3config'])
+kms = boto3.client('kms', config=st.session_state['b3config'])
+codebuild = boto3.client('codebuild', config=st.session_state['b3config'])
 
 # Check environment bucket to see if it exists
 created = is_account_bootstrapped(account_id)
