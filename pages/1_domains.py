@@ -28,7 +28,7 @@ if st.checkbox('Use Route53', value=st.session_state['config']['env']['domain'][
         route53_name = domain + '.'
         print(f"Domain: {route53_name}")
         for zone in hosted_zones:
-            print(f'Zone: "{zone['Name']}" check agains "{route53_name}"')
+            print(f'Zone: "{zone["Name"]}" check against "{route53_name}"')
             if route53_name == zone['Name']:
                 print(f"Found hosted zone: {zone['Name']}")
                 st.session_state['config']['env']['domain']['hostedzone']['id'] = zone['Id'].split('/')[2]
@@ -50,7 +50,7 @@ if st.checkbox('Use Route53', value=st.session_state['config']['env']['domain'][
                     st.session_state['config']['env']['domain']['sub']['device']['cert'] = cert['CertificateArn']
                 else:
                     st.error('Certificate not issued')
-                    link('AWS Certificate Manager', f'https://{st.session_state['config']['env']['region']['primary']}.console.aws.amazon.com/acm/home')
+                    link('AWS Certificate Manager', f'https://{st.session_state["config"]["env"]["region"]["primary"]}.console.aws.amazon.com/acm/home')
                 break
         
         if not st.session_state['config']['env']['domain']['sub']['api']['cert']:

@@ -157,6 +157,7 @@ Resources:
           echo "AWS_REGION=${AWS::Region}" >> /etc/environment
           echo "AWS_DEFAULT_REGION=${AWS::Region}" >> /etc/environment
           echo "CDK_DEFAULT_REGION=${AWS::Region}" >> /etc/environment
+          . /etc/environment
           
           # Configure CloudWatch logs
           mkdir -p /var/log/mytaptrack
@@ -175,6 +176,14 @@ Resources:
           
           [Install]
           WantedBy=multi-user.target
+          EOF
+
+          # Write aws config file and set default region
+          mkdir -p ~/.aws
+          cat > ~/.aws/config << 'EOF'
+          [default]
+          output=json
+          region=${AWS::Region}
           EOF
           
           # Enable and start the service
