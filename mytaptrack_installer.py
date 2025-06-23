@@ -122,6 +122,11 @@ if 'AWS_REGION' in os.environ:
 if 'config' in st.session_state and 'region' in st.session_state['config']['env'] and 'primary' in st.session_state['config']['env']['region']:
     index = regions.index(st.session_state['config']['env']['region']['primary'])
 
+if index == 0:
+    # Find default AWS region stored in environment variable AWS_DEFAULT_REGION
+    if 'AWS_DEFAULT_REGION' in os.environ:
+        index = regions.index(os.environ['AWS_DEFAULT_REGION'])
+
 primary = st.selectbox('Primary AWS Region', regions, index=index)
 st.session_state['config']['env']['region']['primary'] = primary
 

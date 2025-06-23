@@ -51,9 +51,9 @@ Parameters:
     Default: "t4g.small"
     Description: "EC2 instance type"
     
-  KeyName:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: "Name of an existing EC2 KeyPair to enable SSH access to the instance"
+  # KeyName:
+  #   Type: AWS::EC2::KeyPair::KeyName
+  #   Description: "Name of an existing EC2 KeyPair to enable SSH access to the instance"
 
 Resources:
   # Create ECSClusterContainerSecurityGroup
@@ -123,7 +123,6 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
-      KeyName: !Ref KeyName
       IamInstanceProfile: !Ref EC2InstanceProfile
       SecurityGroupIds:
         - !Ref EC2SecurityGroup
@@ -155,6 +154,9 @@ Resources:
           
           # Set environment variables
           echo "PASSWORD=${Password}" >> /etc/environment
+          echo "AWS_REGION=${AWS::Region}" >> /etc/environment
+          echo "AWS_DEFAULT_REGION=${AWS::Region}" >> /etc/environment
+          echo "CDK_DEFAULT_REGION=${AWS::Region}" >> /etc/environment
           
           # Configure CloudWatch logs
           mkdir -p /var/log/mytaptrack
