@@ -1,4 +1,35 @@
 
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-0db36bcbb6bf68b98  # AWS Linux ARM64
+    us-east-2:
+      AMI: ami-0779fe5e56472b841  # AWS Linux ARM64
+    us-west-1:
+      AMI: ami-08b5fae7084200be9  # AWS Linux ARM64
+    us-west-2:
+      AMI: ami-0f39276b2d3b617c4  # AWS Linux ARM64
+    ca-central-1:
+      AMI: ami-02f23bd45a5aca055  # AWS Linux ARM64
+    eu-west-1:
+      AMI: ami-050f21086f4c30842  # AWS Linux ARM64
+    eu-west-2:
+      AMI: ami-06f94d7cfec0d7541  # AWS Linux ARM64
+    eu-west-3:
+      AMI: ami-0824fcaa23a28b8e3  # AWS Linux ARM64
+    eu-central-1:
+      AMI: ami-08e6029eb75badecc  # AWS Linux ARM64
+    eu-north-1:
+      AMI: ami-0fa38efbb587e9f2a  # AWS Linux ARM64
+    ap-south-1:
+      AMI: ami-0f4448044b7b1e09b  # AWS Linux ARM64
+    ap-northeast-1:
+      AMI: ami-06f8ebd29e0d94163  # AWS Linux ARM64
+    ap-southeast-1:
+      AMI: ami-0fccc46d9ea7914b4  # AWS Linux ARM64
+    ap-southeast-2:
+      AMI: ami-0719aba35db68e28a  # AWS Linux ARM64
+
 Parameters:
   # Make Parameters for VPC and Subnet selection
   VpcId:
@@ -7,9 +38,6 @@ Parameters:
   SubnetId:
     Type: AWS::EC2::Subnet::Id
     Description: "Subnet to use"
-  SubnetId2:
-    Type: AWS::EC2::Subnet::Id
-    Description: "A different subnet to use"
   
   Password:
     NoEcho: true
@@ -17,49 +45,19 @@ Parameters:
     Description: "Password for the installation website"
     MinLength: 1
     MaxLength: 41
+    
+  InstanceType:
+    Type: String
+    Default: "t4g.small"
+    Description: "EC2 instance type"
+    
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: "Name of an existing EC2 KeyPair to enable SSH access to the instance"
 
 Resources:
-
-  # Create a cloudwatch log group
-
-  CloudWatchLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: "mytaptrack/installer"
-      RetentionInDays: 7
-
-
-  # Create ECSClusterTaskExecutionRoleARN
-  ECSClusterTaskExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - "ecs-tasks.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        - PolicyName: "AmazonECSTaskExecutionRolePolicy"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "ecr:GetAuthorizationToken"
-                  - "ecr:BatchCheckLayerAvailability"
-                  - "ecr:GetDownloadUrlForLayer"
-                  - "ecr:BatchGetImage"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
-                Resource: "*"
-
   # Create ECSClusterContainerSecurityGroup
-  ECSClusterContainerSecurityGroup:
+  EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "ECS Cluster Container Access"
@@ -74,13 +72,8 @@ Resources:
         - Key: "Name"
           Value: "ECS Cluster SG"
 
-  # # Create Fargate Cluster, Service and Task
-  FargateCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: mytaptrack-installer-cluster
-
-  AdminTaskRole:
+  # Create IAM role for EC2 instance
+  EC2InstanceRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -88,20 +81,21 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: ecs-tasks.amazonaws.com
+              Service: ec2.amazonaws.com
             Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Policies:
-        - PolicyName: mytaptrack-installer-task-role
+        - PolicyName: mytaptrack-installer-instance-role
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Action:
-                     # Allow read access to SSM Parameter Store
+                  # Allow read access to SSM Parameter Store
                   - "ssm:GetParameters"
                   - "ssm:GetParameter"
                   - "ssm:GetParameterHistory"
                   - "ssm:GetParametersByPath"
-
                   # Allow writing logs to CloudWatch
                   - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
@@ -112,101 +106,79 @@ Resources:
                   - "cloudformation:*"
                   - "codebuild:*"
                   - "secretsmanager:*"
-                  - "ecr:*"
-                  - "ecs:*"
-                  - "lambda:*"
-                  - "dynamodb:*"
                 Effect: Allow
                 Resource: "*"
-  FargateTask:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: mytaptrack-installer-task
-      Cpu: '256'
-      Memory: '512'
-      NetworkMode: awsvpc
-      RuntimePlatform:
-        CpuArchitecture: ARM64
-      RequiresCompatibilities:
-        - FARGATE
-      ExecutionRoleArn: !GetAtt ECSClusterTaskExecutionRole.Arn
-      TaskRoleArn: !GetAtt AdminTaskRole.Arn
-      ContainerDefinitions:
-        - Name: installer
-          Image: mytaptrack/installer
-          Cpu: 256
-          Memory: 512
-          PortMappings:
-            - ContainerPort: 8501
-          Environment:
-            - Name: "PASSWORD"
-              Value: !Ref Password
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group: "mytaptrack/installer"
-              awslogs-region: !Ref "AWS::Region"
-              awslogs-stream-prefix: "ecs"
 
-  FargateService:
-    Type: AWS::ECS::Service
+  # Create instance profile for EC2 instance
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
     Properties:
-      ServiceName: mytaptrack-installer-service
-      Cluster: !Ref FargateCluster
-      DesiredCount: 1
-      TaskDefinition: !Ref FargateTask
-      LaunchType: FARGATE
-      LoadBalancers:
-        - ContainerName: "installer"
-          ContainerPort: 8501
-          TargetGroupArn: !Ref TargetGroup
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          SecurityGroups:
-            - !Ref ECSClusterContainerSecurityGroup
-          Subnets:
-            - !Ref SubnetId
-  
-  # Create application load balancer
-  ApplicationLoadBalancer:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+      Path: "/"
+      Roles:
+        - !Ref EC2InstanceRole
+
+  # Create EC2 instance
+  EC2Instance:
+    Type: AWS::EC2::Instance
     Properties:
-      Name: "Application-LB"
-      Type: "application"
-      SecurityGroups:
-        - !Ref ECSClusterContainerSecurityGroup
-      Subnets:
-        - !Ref SubnetId
-        - !Ref SubnetId2
-  
-  # Create target group for the application load balancer
-  TargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Name: "Application-TG"
-      Protocol: HTTP
-      Port: 8501
-      VpcId: !Ref VpcId
-      TargetType: ip
-      HealthCheckPath: "/"
-      HealthCheckIntervalSeconds: 30
-      HealthCheckTimeoutSeconds: 10
-      HealthyThresholdCount: 3
-      UnhealthyThresholdCount: 3
-    
-  # Create a listener for the application load balancer
-  Listener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !Ref TargetGroup
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 8501
-      Protocol: HTTP
-Outputs:
-  # Output the tasks public ip address
-  PublicUrl:
-    Description: "Fargate Service Public IP"
-    Value: !Join [":", [!GetAtt ApplicationLoadBalancer.DNSName, "8501"]]
+      InstanceType: !Ref InstanceType
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      SubnetId: !Ref SubnetId
+      Tags:
+        - Key: Name
+          Value: mytaptrack-installer
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          # Update and install dependencies
+          yum update
+          yum -y install git python3 python3-pip npm gnupg unzip make
+          
+          # Install AWS CLI
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+          
+          # Install global npm packages
+          npm i aws-cdk esbuild -g
+          
+          # Clone the repository
+          git clone https://github.com/mytaptrack/installer.git /opt/installer
+          cd /opt/installer
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install -r requirements.txt
+          
+          # Set environment variables
+          echo "PASSWORD=${Password}" >> /etc/environment
+          
+          # Configure CloudWatch logs
+          mkdir -p /var/log/mytaptrack
+          
+          # Set up application to start on boot
+          cat > /etc/systemd/system/mytaptrack-installer.service << 'EOF'
+          [Unit]
+          Description=MyTapTrack Installer
+          After=network.target
+          
+          [Service]
+          Environment=PASSWORD=${Password}
+          WorkingDirectory=/opt/installer
+          ExecStart=make fullrun
+          Restart=always
+          
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+          
+          # Enable and start the service
+          systemctl enable mytaptrack-installer
+          systemctl start mytaptrack-installer
+
+Outputs:  
+  SetupWebpage:
+    Value: !Sub "http://${EC2Instance.PublicIp}:8501"
