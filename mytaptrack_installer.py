@@ -28,7 +28,6 @@ if not st.session_state.get('config'):
     st.session_state['config'] = {
         'env': {
             'name': '',
-            'vpc': False,
             'app': {
                 'pushSnsArns': {
                     'android': '',
@@ -40,9 +39,6 @@ if not st.session_state.get('config'):
                         'arn': ''
                     }
                 },
-            },
-            'chatbot': {
-                'arn': ''
             },
             'debug': 'false',
             'domain': {
