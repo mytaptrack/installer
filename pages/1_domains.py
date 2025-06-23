@@ -121,7 +121,4 @@ if not st.session_state['config']['env']['domain']['sub']['device']['apikey']:
 
 st.session_state['config']['env']['domain']['sub']['device']['apikey'] = st.text_input('Enter the api key to use for the mytaptrack app', value=st.session_state['config']['env']['domain']['sub']['device']['apikey'])
 
-if not st.session_state['config']['env']['domain']['sub']['website']['name']:
-    st.stop()
-
 bottom_bar('domains')
