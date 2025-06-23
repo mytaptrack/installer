@@ -19,7 +19,7 @@ st.write('## System Configuration')
 
 st.write('### Networking')
 
-if st.checkbox("Restrict systems to execute in a VPC?", value= st.session_state['config']['env']['vpc'] != None):
+if st.checkbox("Restrict systems to execute in a VPC?", value= 'vpc' not in st.session_state['config']['env']):
     print(f"VPC: {st.session_state['config']['env']['vpc']}")
     if not st.session_state['config']['env']['vpc']:
         st.session_state['config']['env']['vpc'] = {
