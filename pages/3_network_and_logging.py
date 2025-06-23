@@ -19,7 +19,11 @@ st.write('## System Configuration')
 
 st.write('### Networking')
 
-if st.checkbox("Restrict systems to execute in a VPC?", value= 'vpc' in st.session_state['config']['env']):
+# Ensure vpc key exists in config
+if 'vpc' not in st.session_state['config']['env']:
+    st.session_state['config']['env']['vpc'] = None
+
+if st.checkbox("Restrict systems to execute in a VPC?", value=st.session_state['config']['env']['vpc'] is not None):
     print(f"VPC: {st.session_state['config']['env']['vpc']}")
     if not st.session_state['config']['env']['vpc']:
         st.session_state['config']['env']['vpc'] = {
@@ -157,13 +161,17 @@ else:
 
 
 st.write('Chatbots are useful when supporting mytaptrack as errors and specific alerts can be sent to the chatbot')
-if st.checkbox("Use chatbot messaging", value= st.session_state['config']['env']['chatbot'] is not None ):
+# Ensure chatbot key exists in config
+if 'chatbot' not in st.session_state['config']['env']:
+    st.session_state['config']['env']['chatbot'] = None
+
+if st.checkbox("Use chatbot messaging", value=st.session_state['config']['env']['chatbot'] is not None):
     if st.session_state['config']['env']['chatbot'] is None:
         st.session_state['config']['env']['chatbot'] = {
             'arn': ''
         }
     
-    st.session_state['config']['env']['chatbot']['arn'] = st.text_input('Enter the chatbot arn', value= st.session_state['config']['env']['chatbot']['arn'])
+    st.session_state['config']['env']['chatbot']['arn'] = st.text_input('Enter the chatbot arn', value=st.session_state['config']['env']['chatbot']['arn'])
 else:
     st.session_state['config']['env']['chatbot'] = None
 
