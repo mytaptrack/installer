@@ -20,7 +20,7 @@ if 'authenticated' not in st.session_state:
         st.stop()
 
 # Get the account id that we're connected to
-account_id = boto3.client("sts", config=st.session_state['b3config']).get_caller_identity()["Account"]
+account_id = boto3.client("sts").get_caller_identity()["Account"]
 st.session_state['account_id'] = account_id
 
 st.title('Mytaptrack Installer')
