@@ -13,7 +13,7 @@ if 'website' not in st.session_state['config']['env']:
         'sign_up': True
     }
 
-print(f'Domain name {st.session_state['config']['env']['domain']['name']}')
+print(f"Domain name {st.session_state['config']['env']['domain']['name']}")
 if st.session_state['config']['env']['domain']['name'] != '':
     print('Domain name is set')
     if st.checkbox('Publicly host website with this domain?', value=st.session_state['config']['env']['deploy']['website']):
