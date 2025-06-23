@@ -126,6 +126,8 @@ if index == 0:
 primary = st.selectbox('Primary AWS Region', regions, index=index)
 st.session_state['config']['env']['region']['primary'] = primary
 
+os.environ["AWS_REGION"] = primary
+
 if st.checkbox('Include a second disaster recovery region?'):
     secondary = st.selectbox('Secondary AWS Region', regions)
     st.session_state['config']['env']['region']['regions'] = f'{primary}, {secondary}'
