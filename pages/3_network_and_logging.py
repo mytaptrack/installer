@@ -130,7 +130,7 @@ st.write('### Logging')
 if st.checkbox("Use non-default logging bucket"):
     st.session_state['config']['env']['regional']['logging']['bucket'] = st.text_input("Enter the logging bucket name", value=st.session_state['config']['env']['regional']['logging']['bucket'])
 else:
-    bucketName = f'mtt-{account_id}-{st.session_state['config']['env']['region']['primary']}-logs'
+    bucketName = f"mtt-{account_id}-{st.session_state['config']['env']['region']['primary']}-logs"
     
     # Check to see if there is a default logging bucket
     buckets = s3.list_buckets()
