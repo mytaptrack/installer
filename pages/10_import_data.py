@@ -51,7 +51,7 @@ if st.button("Export users"):
     # Download this list as a csv
     st.download_button(
         label="Download user data",
-        data="\n".join([f'{user['email']},{user['username']}' for user in user_data]),
+        data="\n".join([f"{user['email']},{user['username']}" for user in user_data]),
         file_name="user_data.csv",
         mime="text/csv"
     )
