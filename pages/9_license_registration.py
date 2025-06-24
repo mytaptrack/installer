@@ -53,7 +53,7 @@ def register_license(stage: str, name: str, licenseNumber: str, emails: str):
         admins.append(email)
 
     # Add license to dynamodb
-    dynamodb = boto3.resource('dynamodb')
+    dynamodb = boto3.resource('dynamodb', config=st.session_state['b3config'])
     table = dynamodb.Table(f'mytaptrack-{stage}-data')
     table.put_item( Item= {
         'pk': 'L',
