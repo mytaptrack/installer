@@ -8,6 +8,7 @@ import os
 import time
 
 from components.utils import bottom_bar
+from components.html_resources import link
 from components.auth import auth_check
 auth_check()
 from components.utils import apply_styles
@@ -93,6 +94,22 @@ if stack_found and st.button('Run Pipeline', icon=":material/play_arrow:"):
         st.success('Deployment successful')
     else:
         st.error('Deployment failed')
+
+cloudformation = boto3.client('cloudformation', config=st.session_state['b3config'])
+stack = cloudformation.describe_stacks(StackName=f'mytaptrack-{stage}')
+if stack['Stacks'][0]['StackStatus'] in ['CREATE_COMPLETE', 'UPDATE_COMPLETE']:
+    st.success('Deployment stack found')
+    print(f"Stack output: {stack['Stacks'][0]['Outputs']}")
+
+    # Get BehaviorWebsiteStackOutput
+    behavior_website_output = [output for output in stack['Stacks'][0]['Outputs'] if output['OutputKey'] == 'BehaviorWebsiteStackOutput'][0]['OutputValue']
+    if behavior_website_output:
+        link("Behavior Website", behavior_website_output)
+    
+    # Get ManagementWebsiteStackOutput
+    management_website_output = [output for output in stack['Stacks'][0]['Outputs'] if output['OutputKey'] == 'ManagementWebsiteStackOutput'][0]['OutputValue']
+    if management_website_output:
+        link("Management Website", management_website_output)
 
 st.divider()
 
