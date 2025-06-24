@@ -103,9 +103,17 @@ Resources:
                   - "s3:*"
                   - "ssm:*"
                   - "kms:*"
+                  - "ecr:*"
+                  - "iam:*"
                   - "cloudformation:*"
                   - "codebuild:*"
                   - "secretsmanager:*"
+                  - "codepipeline:ListPipelines"
+                  - "codepipeline:StartPipelineExecution"
+                  - "codepipeline:GetPipelineExecution"
+                  - "cognito-idp:*"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:GetItem"
                 Effect: Allow
                 Resource: "*"
 
