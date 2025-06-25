@@ -96,22 +96,26 @@ if stack_found and st.button('Run Pipeline', icon=":material/play_arrow:"):
         st.error('Deployment failed')
 
 cloudformation = boto3.client('cloudformation', config=st.session_state['b3config'])
-stack = cloudformation.describe_stacks(StackName=f'mytaptrack-{stage}')
-if stack['Stacks'][0]['StackStatus'] in ['CREATE_COMPLETE', 'UPDATE_COMPLETE']:
-    st.success('Deployment stack found')
-    print(f"Stack output: {stack['Stacks'][0]['Outputs']}")
+try:
+    stack = cloudformation.describe_stacks(StackName=f'mytaptrack-{stage}')
+    if stack['Stacks'][0]['StackStatus'] in ['CREATE_COMPLETE', 'UPDATE_COMPLETE']:
+        st.success('Deployment stack found')
+        print(f"Stack output: {stack['Stacks'][0]['Outputs']}")
 
-    # Get BehaviorWebsiteStackOutput
-    behavior_website_output = [output for output in stack['Stacks'][0]['Outputs'] if output['OutputKey'] == 'BehaviorWebsiteStackOutput'][0]['OutputValue']
-    if behavior_website_output:
-        link("Behavior Website", behavior_website_output)
-    
-    # Get ManagementWebsiteStackOutput
-    management_website_output = [output for output in stack['Stacks'][0]['Outputs'] if output['OutputKey'] == 'ManagementWebsiteStackOutput'][0]['OutputValue']
-    if management_website_output:
-        link("Management Website", management_website_output)
+        # Get BehaviorWebsiteStackOutput
+        behavior_website_output = [output for output in stack['Stacks'][0]['Outputs'] if output['OutputKey'] == 'BehaviorWebsiteStackOutput'][0]['OutputValue']
+        if behavior_website_output:
+            link("Behavior Website", behavior_website_output)
+        
+        # Get ManagementWebsiteStackOutput
+        management_website_output = [output for output in stack['Stacks'][0]['Outputs'] if output['OutputKey'] == 'ManagementWebsiteStackOutput'][0]['OutputValue']
+        if management_website_output:
+            link("Management Website", management_website_output)
 
-st.divider()
+    st.divider()
+except Exception as e:
+    print(f"Error: {e}")
+    st.error('Deployment stack not found')
 
 if st.button('Remove installer (Save Money)', type='tertiary', icon=':material/delete:'):
     # Delete the installer stack

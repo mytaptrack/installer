@@ -177,7 +177,7 @@ Resources:
           After=network.target
           
           [Service]
-          Environment=PASSWORD=${Password}
+          Environment="PASSWORD=${Password}" "AWS_REGION=${AWS::Region}" "AWS_DEFAULT_REGION=${AWS::Region}" "CDK_DEFAULT_REGION=${AWS::Region}"
           WorkingDirectory=/opt/installer
           ExecStart=make fullrun
           Restart=always
@@ -198,6 +198,6 @@ Resources:
           systemctl enable mytaptrack-installer
           systemctl start mytaptrack-installer
 
-Outputs:  
+Outputs:
   SetupWebpage:
     Value: !Sub "http://${EC2Instance.PublicIp}:8501"
