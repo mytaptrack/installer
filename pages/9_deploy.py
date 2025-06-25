@@ -71,6 +71,17 @@ else:
             yaml.dump(st.session_state['config'], f)
         deploy_codebuild(stage)
 
+stack_found = False
+build_pipelines = codepipeline.list_pipelines()['pipelines']
+pipeline = None
+for project in build_pipelines:
+    print(f'Project: {project} ?? {pipeline_stack_name}')
+    if project['name'] == pipeline_stack_name:
+        st.success('Backend codebuild project found')
+        stack_found = True
+        pipeline = project
+        break
+
 if stack_found and st.button('Run Pipeline', icon=":material/play_arrow:"):
     # Run the codebuild project
     st.write('Running deployment')
