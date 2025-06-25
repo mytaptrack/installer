@@ -115,7 +115,7 @@ try:
     st.divider()
 except Exception as e:
     print(f"Error: {e}")
-    st.error('Deployment stack not found')
+    st.write('Deployment stack not found')
 
 if st.button('Remove installer (Save Money)', type='tertiary', icon=':material/delete:'):
     # Delete the installer stack
