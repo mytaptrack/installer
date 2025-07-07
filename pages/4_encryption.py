@@ -9,6 +9,7 @@ from components.auth import auth_check
 auth_check()
 from components.utils import apply_styles
 apply_styles()
+from components.utils import generate_api_key
 
 ssm = boto3.client('ssm', config=st.session_state['b3config'])
 kms = boto3.client('kms', config=st.session_state['b3config'])
@@ -29,7 +30,7 @@ try:
     st.success('Encryption key found')
 except Exception as e:
     st.error('Encryption key not found')
-    if st.button('Create Encryption Key'):
+    if st.button('Create Token Encryption Key'):
         # Create the key
         ssm.put_parameter(
             Name=st.session_state['config']['env']['app']['secrets']['tokenKey']['name'],
@@ -39,6 +40,7 @@ except Exception as e:
         )
         st.success('Encryption key created')
     print(e)
+    st.stop()
 
 if st.checkbox('Customize encryption'):
     # Get list of kms keys and aliases

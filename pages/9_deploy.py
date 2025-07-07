@@ -135,4 +135,12 @@ if st.button('Remove installer (Save Money)', type='tertiary', icon=':material/d
 st.write("""Removing the installer does not mean you can't reinstall it and continue where you left off. 
          All this does is remove the active components which cost money to run and are not necessary for mytaptrack to operate.""")
 
+st.divider()
+
+if st.button("Update installer"):
+    # Update installer
+    os.system('git pull')
+    st.rerun()
+    st.success('Complete')
+
 bottom_bar('deploy')
